@@ -79,12 +79,10 @@ git clone https://github.com/n7tae/mrefd.git
 cd mrefd
 ```
 
-### Create and edit your blacklist, whitelist and linking files
+### Create and edit your run-time and compile-time configuration files
 
 ```bash
-cp config/mrefd.blacklist .
-cp config/mrefd.whitelist .
-cp config/mrefd.interlink .
+cp -r config .
 ```
 
 Use your favorite editor to modify each of these files. If you want a totally open network, the blacklist and whitelist files are ready to go. The blacklist determine which callsigns can't use the reflector. The whitelist determines which callsigns can use the reflector. The mrefd reflector will monitor these file and dynamically update itself whenever anything changes. There is no need to stop and restart the reflector.
@@ -95,22 +93,13 @@ If your reflector or your desired peer doesn't use **Ham-DHT**, you can specify 
 
 Inter-linking a channel to more than one other reflector demands all reflector in a group are linked to all other reflectors in the group. This will result in the shortest possible latency between a client and any other client on the group. This XLX-like mode of linking is enforced by implementing a *one hop* policy where a voice stream is marked by a reflector when it is passed to another reflector. The receiving reflector will then know not to pass the voice stream on to any other reflector.
 
-Group administration will require coordination among the admins of all involved reflectors. If a group member drops out or if a new member wants to join a group, all other group members will need to remove or add a line to their mrefd.interlink file.
+Group administration will require coordination among the admins of all involved reflectors. If a group member drops an interlink connection, or if a new member wants to join a group, all other group members will need to remove or add a line to their mrefd.interlink file. Please note that interlink groups with lots of participants are **extremely** difficult to maintain.
 
-### Configuring your reflector
-
-Configuring, compiling and maintaining your reflector build is easy! Start by copying the configuration example files:
-
-```bash
-cp example.mk mrefd.mk     # this  file  sets the compile-time configuration
-cp example.cfg mrefd.cfg   # while this file sets the run-time configuration
-```
-
-Use your favorite editor to edit mrefd.mk and mrefd.cfg. These file contains comments so it should be obvious what values need changing.
+Finally, the mrefd.mk file sets the compile-time configuration, while the mrefd.cfg file sets the run-time configuration. Your mrefd.mk file will probably not need to be modified, while *every* installation will require a custom mrefd.cfg file. These two file contains comments so it should be obvious what values need changing for your installation.
 
 ### Compiling and installing your system
 
-After you have written your configuration files, you can build and install your system:
+After you have edited your configuration files, you can build and install your system:
 
 ```bash
 make && sudo make install
@@ -134,7 +123,7 @@ To view the mrefd log:
 sudo journalctl -u mrefd -f
 ```
 
-The blacklist, whitelist and interlink files can be modified in real time while xrfd is executing and the reflector will update itself within a few seconds. If `USESYMLINK` is true in your mrefd.mk file, then you can edit the files in your build directory. Otherwise, you will need to edit the files in the `CFGDIR` folder.
+The blacklist, whitelist and interlink files can be modified in real time while mrefd is executing and the reflector will update itself within a few seconds. If `USESYMLINK` is true in your mrefd.mk file, then you can edit the files in your build directory. Otherwise, you will need to edit the files in the `CFGDIR` folder.
 
 ### Install the Dashboard
 
@@ -158,29 +147,21 @@ make
 sudo make install
 ```
 
-If, after doing the `git pull`, you see that it's downloaded a new example.cfg file, it would probably be a good idea to remake your mrefd.cfg file. There may be new options of which you might want to take advantage.
-
-## Running multiple instances
-
-It should be fairly straightforward to install multiple mrefd instances on a single server. Make sure each instance is using a different listening port. Things to me aware of:
-
-- The reflector executable name is defined in the Makefile at the line "EXE=mrefd".
-- The configuration file is read at start-up and defined in mrefd.service file. Each instance would require a different service file.
-- Each instance will need its own config files with unique paths to those files.
-- Each instance will need a unique url so that each will have its own webpage.
-- Need to add unix sockets for interlinking between instances.
-
-This is **not** a task for a beginner!
+If after doing the `git pull`, you see that it's downloaded a new files in the config directory, it would probably be a good idea to review what changed and make sure your copies of the configuration files are still compatible with the new version. There may be new options of which you might want to take advantage.
 
 ## Firewall settings
 
-MREFD requires the following port to be open to inbound network traffic:
+This reflector requires the following port to be open to inbound network traffic:
 
 - UDP port 17000 for M17
 - UDP port 17171 for DHT
 - TCP port 80 for HTTP
 - TCP port 443 for HTTPS
 
+## Running multiple instances
+
+It is possible to run multiple mrefd instances on a single server. Make sure each instance is using a different listening port. Each instance will need its own make file and configuration files, and service file. This is **not** a task for a beginner! Only one instance can use the DHT.
+
 ## Copyright
 
-- Copyright © 2020-2022 Thomas A. Early N7TAE
+- Copyright © 2020-2024 Thomas A. Early N7TAE

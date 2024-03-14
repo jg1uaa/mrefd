@@ -37,8 +37,10 @@ void SigHandler(int sig)
 	switch (sig)
 	{
 	case SIGINT:
-	case SIGHUP:
 	case SIGTERM:
+#ifndef NO_SIGHUP
+	case SIGHUP:
+#endif
 		std::cout << "caught a signal=" << sig << std::endl;
 		break;
 	default:
@@ -50,8 +52,11 @@ void SigHandler(int sig)
 int main(int argc, char *argv[])
 {
 	std::signal(SIGINT, SigHandler);
-	std::signal(SIGHUP, SigHandler);
 	std::signal(SIGTERM, SigHandler);
+#ifndef NO_SIGHUP
+	std::signal(SIGHUP, SigHandler);
+#endif
+
 	if (2 != argc)
 	{
 		std::cerr << "USAGE: " << argv[0] << " /full/pathname/to/config/file>" << std::endl;

@@ -4,7 +4,5 @@
 *.blacklist
 *.whitelist
 *.interlink
-mrefd.cfg
-mrefd.mk
-mrefd
+mrefd*
 test-all
